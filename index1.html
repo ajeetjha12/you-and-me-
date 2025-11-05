@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You & Me 💖 - Realtime Chat</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        /* Modern Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Cool Background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 500px; /* फ़ोन साइज़ के लिए सही */
+            height: 90vh;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative; /* AASTHARSH टैग के लिए यह ज़रूरी है */
+        }
+
+        /* Header */
+        .chat-header {
+            padding: 15px 20px;
+            background-color: #7b4397; /* Deep Purple */
+            color: white;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(to right, #7b4397, #dc2430); /* Advanced Gradient */
+        }
+
+        .status-indicator {
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .online {
+            background-color: #38ef7d; /* Green */
+            color: black;
+        }
+        .offline {
+            background-color: #f44336;
+            color: white;
+        }
+
+        /* Messages Area */
+        .chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: #f9f9f9;
+        }
+
+        /* Message Bubble */
+        .message {
+            max-width: 80%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            line-height: 1.4;
+            position: relative;
+            word-wrap: break-word;
+            font-size: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+        
+        .message:hover {
+            transform: translateY(-1px);
+        }
+
+        .incoming { /* GF के मैसेज */
+            background-color: #ffffff;
+            border: 1px solid #eee;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .outgoing { /* आपके मैसेज */
+            background-color: #dc2430; /* Red Accent from Gradient */
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message strong {
+            display: block;
+            font-size: 11px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .message-time {
+            display: block;
+            font-size: 9px;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .outgoing .message-time {
+            color: #ffcdd2; /* Light color for dark bubble */
+        }
+
+        /* Media/Attachment Styling */
+        .message img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .message audio {
+            max-width: 100%;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* Input Area */
+        .chat-input-area {
+            padding: 10px 15px;
+            border-top: 1px solid #ddd;
+            background-color: #ffffff;
+        }
+
+        #username-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        .message-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        #message-input {
+            flex-grow: 1;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 25px;
+            background-color: #f0f0f0;
+            font-size: 16px;
+            outline: none;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s;
+        }
+        #message-input:focus {
+            background-color: #fff;
+            box-shadow: 0 0 0 2px #7b4397;
+        }
+
+        .message-controls button {
+            background: linear-gradient(to right, #7b4397, #dc2430);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: opacity 0.3s, transform 0.1s;
+        }
+
+        .message-controls button:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        /* Stylish AASTHARSH Tag - Top Right Corner */
+        .aastarsh-tag {
+            position: absolute;
+            top: 0; 
+            right: 0;
+            padding: 4px 8px; 
+            font-size: 10px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.25); 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border-bottom-left-radius: 12px; 
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .chat-container {
+                height: 100vh;
+                max-width: 100%;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <header class="chat-header">
+            <h1>You & Me 💖</h1>
+            <div id="user-status" class="status-indicator offline">Offline</div>
+        </header>
+        
+        <span class="aastarsh-tag">AASTHARSH</span>
+
+        <div class="chat-messages" id="chat-messages">
+            </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="username-input" placeholder="💌 अपना नाम डालें (e.g., Mera Pyar)">
+            
+            <input type="file" id="image-upload" accept="image/*" style="display: none;">
+            <input type="file" id="audio-upload" accept="audio/*" style="display: none;">
+
+            <div class="message-controls">
+                <button id="image-btn" title="फोटो भेजें"><i class="fas fa-image"></i></button>
+                <button id="emoji-btn" title="इमोजी/GIF"><i class="fas fa-laugh-beam"></i></button>
+                <button id="voice-btn" title="वॉइस मैसेज भेजें"><i class="fas fa-microphone"></i></button>
+                <input type="text" id="message-input" placeholder="मैसेज लिखें...">
+                <button id="send-btn" title="भेजें"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-storage.js"></script>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
